@@ -1,0 +1,32 @@
+<form class="task-form" (ngSubmit)="submit()">
+  @if (error) {
+    <p class="form-error">{{ error }}</p>
+  }
+
+  <div class="form-field">
+    <label for="title">Titre <span class="required">*</span></label>
+    <input
+      id="title"
+      type="text"
+      [(ngModel)]="title"
+      name="title"
+      placeholder="Nom de la tâche"
+      required
+    />
+  </div>
+
+  <div class="form-field">
+    <label for="content">Description</label>
+    <textarea
+      id="content"
+      [(ngModel)]="content"
+      name="content"
+      placeholder="Description optionnelle"
+      rows="3"
+    ></textarea>
+  </div>
+
+  <button type="submit" [disabled]="!title.trim() || submitting">
+    {{ submitting ? 'Enregistrement...' : isEditMode ? 'Enregistrer' : 'Créer la tâche' }}
+  </button>
+</form>

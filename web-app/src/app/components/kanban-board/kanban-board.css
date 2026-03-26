@@ -1,0 +1,83 @@
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.kanban-column {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 12px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 4px 8px;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 4px;
+}
+
+.column-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.column-count {
+  background: #e2e8f0;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 60px;
+}
+
+.drag-item {
+  cursor: grab;
+}
+
+.drag-item:active {
+  cursor: grabbing;
+}
+
+.drag-item.cdk-drag-animating {
+  transition: transform 250ms ease;
+}
+
+.cdk-drag-preview {
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  opacity: 0.95;
+}
+
+.drag-placeholder {
+  background: #e2e8f0;
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  min-height: 60px;
+}
+
+.task-list.cdk-drop-list-dragging .drag-item:not(.cdk-drag-placeholder) {
+  transition: transform 250ms ease;
+}
+
+.column-empty {
+  text-align: center;
+  font-size: 13px;
+  color: #cbd5e1;
+  padding: 16px 0;
+}

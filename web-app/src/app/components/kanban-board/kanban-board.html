@@ -1,0 +1,34 @@
+<div class="kanban-board">
+  @for (col of columns; track col.status) {
+    <div class="kanban-column">
+      <div class="column-header">
+        <span class="column-label">{{ col.label }}</span>
+        <span class="column-count">{{ col.tasks.length }}</span>
+      </div>
+
+      <div
+        class="task-list"
+        cdkDropList
+        [id]="'col-' + col.status"
+        [cdkDropListData]="col.tasks"
+        [cdkDropListConnectedTo]="columnIds"
+        (cdkDropListDropped)="drop($event, col)"
+      >
+        @for (task of col.tasks; track task.id) {
+          <div cdkDrag [cdkDragData]="task" class="drag-item">
+            <app-task-card
+              [task]="task"
+              (editRequested)="editRequested.emit($event)"
+              (deleteRequested)="deleteRequested.emit($event)"
+            />
+            <div *cdkDragPlaceholder class="drag-placeholder"></div>
+          </div>
+        }
+
+        @if (col.tasks.length === 0) {
+          <div class="column-empty">Aucune tâche</div>
+        }
+      </div>
+    </div>
+  }
+</div>

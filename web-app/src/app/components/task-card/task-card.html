@@ -1,0 +1,18 @@
+<div class="task-card">
+  <div class="task-card-header">
+    <span class="task-status" [class]="statusClass">{{ statusLabel }}</span>
+    <div class="task-actions">
+      <button class="btn-menu" (click)="toggleMenu($event)">⋮</button>
+      @if (menuOpen) {
+        <div class="dropdown">
+          <button class="dropdown-item" (click)="onEdit($event)">Modifier</button>
+          <button class="dropdown-item danger" (click)="onDelete($event)">Supprimer</button>
+        </div>
+      }
+    </div>
+  </div>
+  <h3 class="task-title">{{ task().title }}</h3>
+  @if (task().content) {
+    <p class="task-content">{{ task().content }}</p>
+  }
+</div>
