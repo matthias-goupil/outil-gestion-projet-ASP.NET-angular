@@ -1,0 +1,47 @@
+<div class="container">
+  <div class="page-header">
+    <h1>Mes projets</h1>
+    <button class="btn-new" (click)="showCreateModal.set(true)">+ Nouveau projet</button>
+  </div>
+
+  @if (loading()) {
+    <p class="state-message">Chargement...</p>
+  } @else if (error()) {
+    <p class="state-message error">{{ error() }}</p>
+  } @else if (projects().length === 0) {
+    <p class="state-message">Aucun projet pour le moment.</p>
+  } @else {
+    <div class="project-grid">
+      @for (project of projects(); track project.id) {
+        <div (click)="openProject(project)">
+          <app-project-card
+            [project]="project"
+            (editRequested)="projectToEdit.set($event)"
+            (deleteRequested)="projectToDelete.set($event)"
+          />
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (showCreateModal()) {
+  <app-modal title="Nouveau projet" (closed)="showCreateModal.set(false)">
+    <app-project-form (projectCreated)="onProjectCreated($event)" />
+  </app-modal>
+}
+
+@if (projectToEdit()) {
+  <app-modal title="Modifier le projet" (closed)="projectToEdit.set(null)">
+    <app-project-form [project]="projectToEdit()" (projectUpdated)="onProjectUpdated($event)" />
+  </app-modal>
+}
+
+@if (projectToDelete()) {
+  <app-confirm-modal
+    message="Supprimer « {{ projectToDelete()!.name }} » ? Toutes ses tâches seront supprimées."
+    confirmLabel="Supprimer"
+    (confirmed)="confirmDelete()"
+    (cancelled)="projectToDelete.set(null)"
+  />
+}

@@ -1,0 +1,48 @@
+<div class="container">
+  <div class="page-header">
+    <div class="breadcrumb">
+      <a class="back-link" routerLink="/">← Projets</a>
+      @if (project()) {
+        <h1>{{ project()!.name }}</h1>
+        @if (project()!.description) {
+          <p class="project-desc">{{ project()!.description }}</p>
+        }
+      }
+    </div>
+    <button class="btn-new" (click)="showCreateModal.set(true)">+ Nouvelle tâche</button>
+  </div>
+
+  @if (loading()) {
+    <p class="state-message">Chargement...</p>
+  } @else if (error()) {
+    <p class="state-message error">{{ error() }}</p>
+  } @else {
+    <app-kanban-board
+      [tasks]="tasks()"
+      [projectId]="projectId"
+      (editRequested)="taskToEdit.set($event)"
+      (deleteRequested)="taskToDelete.set($event)"
+    />
+  }
+</div>
+
+@if (showCreateModal()) {
+  <app-modal title="Nouvelle tâche" (closed)="showCreateModal.set(false)">
+    <app-task-form [projectId]="projectId" (taskCreated)="onTaskCreated($event)" />
+  </app-modal>
+}
+
+@if (taskToEdit()) {
+  <app-modal title="Modifier la tâche" (closed)="taskToEdit.set(null)">
+    <app-task-form [projectId]="projectId" [task]="taskToEdit()" (taskUpdated)="onTaskUpdated($event)" />
+  </app-modal>
+}
+
+@if (taskToDelete()) {
+  <app-confirm-modal
+    message="Supprimer « {{ taskToDelete()!.title }} » ? Cette action est irréversible."
+    confirmLabel="Supprimer"
+    (confirmed)="confirmDelete()"
+    (cancelled)="taskToDelete.set(null)"
+  />
+}

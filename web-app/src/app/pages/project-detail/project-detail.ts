@@ -1,0 +1,67 @@
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { KanbanBoard } from '../../components/kanban-board/kanban-board';
+import { TaskForm } from '../../components/task-form/task-form';
+import { Modal } from '../../components/modal/modal';
+import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
+import { ProjectService } from '../../services/project.service';
+import { TaskService } from '../../services/task.service';
+import { Project } from '../../models/project.model';
+import { Task } from '../../models/task.model';
+
+@Component({
+  selector: 'app-project-detail',
+  imports: [KanbanBoard, TaskForm, Modal, ConfirmModal, RouterLink],
+  templateUrl: './project-detail.html',
+  styleUrl: './project-detail.css'
+})
+export class ProjectDetail implements OnInit {
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly projectService = inject(ProjectService);
+  private readonly taskService = inject(TaskService);
+
+  project = signal<Project | null>(null);
+  tasks = signal<Task[]>([]);
+  loading = signal(true);
+  error = signal<string | null>(null);
+
+  showCreateModal = signal(false);
+  taskToEdit = signal<Task | null>(null);
+  taskToDelete = signal<Task | null>(null);
+
+  get projectId() { return Number(this.route.snapshot.paramMap.get('id')); }
+
+  ngOnInit() {
+    const id = this.projectId;
+    this.projectService.getById(id).subscribe({
+      next: (project) => { this.project.set(project); },
+      error: () => this.error.set('Projet introuvable.')
+    });
+    this.taskService.getAll(id).subscribe({
+      next: (tasks) => { this.tasks.set(tasks); this.loading.set(false); },
+      error: () => { this.error.set('Impossible de charger les tâches.'); this.loading.set(false); }
+    });
+  }
+
+  onTaskCreated(task: Task) {
+    this.tasks.update(list => [...list, task]);
+    this.showCreateModal.set(false);
+  }
+
+  onTaskUpdated(updated: Task) {
+    this.tasks.update(list => list.map(t => t.id === updated.id ? updated : t));
+    this.taskToEdit.set(null);
+  }
+
+  confirmDelete() {
+    const task = this.taskToDelete();
+    if (!task) return;
+    this.taskService.delete(this.projectId, task.id).subscribe({
+      next: () => {
+        this.tasks.update(list => list.filter(t => t.id !== task.id));
+        this.taskToDelete.set(null);
+      }
+    });
+  }
+}

@@ -1,107 +1,100 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Api.Models;
+using Api.DTOs;
 
-namespace api.Controllers
+namespace Api.Controllers;
+
+[Route("api/projects/{projectId}/tasks")]
+[ApiController]
+public class TaskItemsController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class TaskItemsController : ControllerBase
+    private readonly TaskContext _context;
+
+    public TaskItemsController(TaskContext context)
     {
-        private readonly TaskContext _context;
-
-        public TaskItemsController(TaskContext context)
-        {
-            _context = context;
-        }
-
-        // GET: api/TaskItems
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TaskItem>>> GetTasks()
-        {
-            return await _context.Tasks.ToListAsync();
-        }
-
-        // GET: api/TaskItems/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<TaskItem>> GetTaskItem(int id)
-        {
-            var taskItem = await _context.Tasks.FindAsync(id);
-
-            if (taskItem == null)
-            {
-                return NotFound();
-            }
-
-            return taskItem;
-        }
-
-        // PUT: api/TaskItems/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTaskItem(int id, TaskItem taskItem)
-        {
-            if (id != taskItem.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(taskItem).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TaskItemExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/TaskItems
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<TaskItem>> PostTaskItem(TaskItem taskItem)
-        {
-            _context.Tasks.Add(taskItem);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetTaskItem", new { id = taskItem.Id }, taskItem);
-        }
-
-        // DELETE: api/TaskItems/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTaskItem(int id)
-        {
-            var taskItem = await _context.Tasks.FindAsync(id);
-            if (taskItem == null)
-            {
-                return NotFound();
-            }
-
-            _context.Tasks.Remove(taskItem);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool TaskItemExists(int id)
-        {
-            return _context.Tasks.Any(e => e.Id == id);
-        }
+        _context = context;
     }
+
+    // GET: api/projects/5/tasks
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<TaskItemDto>>> GetTasks(int projectId)
+    {
+        if (!await _context.Projects.AnyAsync(p => p.Id == projectId)) return NotFound();
+
+        return await _context.Tasks
+            .Where(t => t.ProjectId == projectId)
+            .Select(t => ToDto(t))
+            .ToListAsync();
+    }
+
+    // GET: api/projects/5/tasks/3
+    [HttpGet("{id}")]
+    public async Task<ActionResult<TaskItemDto>> GetTaskItem(int projectId, int id)
+    {
+        var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.ProjectId == projectId);
+        if (task == null) return NotFound();
+        return ToDto(task);
+    }
+
+    // POST: api/projects/5/tasks
+    [HttpPost]
+    public async Task<ActionResult<TaskItemDto>> PostTaskItem(int projectId, TaskItemCreateDto dto)
+    {
+        if (!await _context.Projects.AnyAsync(p => p.Id == projectId)) return NotFound();
+
+        var task = new TaskItem
+        {
+            Title = dto.Title,
+            Content = dto.Content,
+            Status = dto.Status,
+            Order = dto.Order,
+            ProjectId = projectId
+        };
+
+        _context.Tasks.Add(task);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetTaskItem), new { projectId, id = task.Id }, ToDto(task));
+    }
+
+    // PUT: api/projects/5/tasks/3
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutTaskItem(int projectId, int id, TaskItemDto dto)
+    {
+        if (id != dto.Id || projectId != dto.ProjectId) return BadRequest();
+
+        var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.ProjectId == projectId);
+        if (task == null) return NotFound();
+
+        task.Title = dto.Title;
+        task.Content = dto.Content;
+        task.Status = dto.Status;
+        task.Order = dto.Order;
+
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    // DELETE: api/projects/5/tasks/3
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteTaskItem(int projectId, int id)
+    {
+        var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.ProjectId == projectId);
+        if (task == null) return NotFound();
+
+        _context.Tasks.Remove(task);
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    private static TaskItemDto ToDto(TaskItem t) => new()
+    {
+        Id = t.Id,
+        Title = t.Title,
+        Content = t.Content,
+        Status = t.Status,
+        Order = t.Order,
+        ProjectId = t.ProjectId
+    };
 }

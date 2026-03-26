@@ -13,6 +13,7 @@ import { TaskStatus } from '../../models/task-status.model';
 export class TaskForm implements OnInit {
   private readonly taskService = inject(TaskService);
 
+  projectId = input.required<number>();
   task = input<Task | null>(null);
   taskCreated = output<Task>();
   taskUpdated = output<Task>();
@@ -34,35 +35,20 @@ export class TaskForm implements OnInit {
 
   submit() {
     if (!this.title.trim()) return;
-
     this.submitting = true;
     this.error = null;
 
     const task = this.task();
-
     if (task) {
-      this.taskService.update(task.id, { ...task, title: this.title.trim(), content: this.content.trim() || undefined }).subscribe({
-        next: () => {
-          this.taskUpdated.emit({ ...task, title: this.title.trim(), content: this.content.trim() || undefined });
-          this.submitting = false;
-        },
-        error: () => {
-          this.error = 'Erreur lors de la modification.';
-          this.submitting = false;
-        }
+      const updated: Task = { ...task, title: this.title.trim(), content: this.content.trim() || undefined };
+      this.taskService.update(this.projectId(), task.id, updated).subscribe({
+        next: () => { this.taskUpdated.emit(updated); this.submitting = false; },
+        error: () => { this.error = 'Erreur lors de la modification.'; this.submitting = false; }
       });
     } else {
-      this.taskService.create({ title: this.title.trim(), content: this.content.trim() || undefined, status: TaskStatus.NotStarted }).subscribe({
-        next: (created) => {
-          this.taskCreated.emit(created);
-          this.title = '';
-          this.content = '';
-          this.submitting = false;
-        },
-        error: () => {
-          this.error = 'Erreur lors de la création.';
-          this.submitting = false;
-        }
+      this.taskService.create(this.projectId(), { title: this.title.trim(), content: this.content.trim() || undefined, status: TaskStatus.NotStarted }).subscribe({
+        next: (created) => { this.taskCreated.emit(created); this.title = ''; this.content = ''; this.submitting = false; },
+        error: () => { this.error = 'Erreur lors de la création.'; this.submitting = false; }
       });
     }
   }

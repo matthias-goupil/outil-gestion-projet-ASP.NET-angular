@@ -21,14 +21,15 @@ export class KanbanBoard implements OnChanges {
   private readonly taskService = inject(TaskService);
 
   tasks = input.required<Task[]>();
+  projectId = input.required<number>();
   editRequested = output<Task>();
   deleteRequested = output<Task>();
 
   columns: KanbanColumn[] = [
-    { status: TaskStatus.NotStarted, label: 'À faire',     tasks: [] },
-    { status: TaskStatus.InProgress, label: 'En cours',    tasks: [] },
-    { status: TaskStatus.OnHold,     label: 'En attente',  tasks: [] },
-    { status: TaskStatus.Completed,  label: 'Terminé',     tasks: [] },
+    { status: TaskStatus.NotStarted, label: 'À faire',    tasks: [] },
+    { status: TaskStatus.InProgress, label: 'En cours',   tasks: [] },
+    { status: TaskStatus.OnHold,     label: 'En attente', tasks: [] },
+    { status: TaskStatus.Completed,  label: 'Terminé',    tasks: [] },
   ];
 
   columnIds = this.columns.map(c => 'col-' + c.status);
@@ -48,14 +49,14 @@ export class KanbanBoard implements OnChanges {
       moveItemInArray(targetColumn.tasks, event.previousIndex, event.currentIndex);
       targetColumn.tasks.forEach((t, i) => {
         if (t.order !== i) {
-          this.taskService.update(t.id, { ...t, order: i }).subscribe();
+          this.taskService.update(this.projectId(), t.id, { ...t, order: i }).subscribe();
           t.order = i;
         }
       });
     } else {
       transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
       const newStatus = targetColumn.status;
-      this.taskService.update(task.id, { ...task, status: newStatus, order: event.currentIndex }).subscribe();
+      this.taskService.update(this.projectId(), task.id, { ...task, status: newStatus, order: event.currentIndex }).subscribe();
       task.status = newStatus;
       task.order = event.currentIndex;
     }

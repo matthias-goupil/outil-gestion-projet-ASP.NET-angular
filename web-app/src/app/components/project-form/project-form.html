@@ -1,0 +1,16 @@
+<form class="project-form" (ngSubmit)="submit()">
+  @if (error) {
+    <p class="form-error">{{ error }}</p>
+  }
+  <div class="form-field">
+    <label for="name">Nom <span class="required">*</span></label>
+    <input id="name" type="text" [(ngModel)]="name" name="name" placeholder="Nom du projet" required />
+  </div>
+  <div class="form-field">
+    <label for="description">Description</label>
+    <textarea id="description" [(ngModel)]="description" name="description" placeholder="Description optionnelle" rows="3"></textarea>
+  </div>
+  <button type="submit" [disabled]="!name.trim() || submitting">
+    {{ submitting ? 'Enregistrement...' : isEditMode ? 'Enregistrer' : 'Créer le projet' }}
+  </button>
+</form>

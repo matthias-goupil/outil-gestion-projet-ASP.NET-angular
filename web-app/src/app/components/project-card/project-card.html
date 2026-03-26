@@ -1,0 +1,46 @@
+<div class="project-card">
+  <div class="card-header">
+    <div class="card-actions">
+      <button class="btn-menu" (click)="toggleMenu($event)">⋮</button>
+      @if (menuOpen) {
+        <div class="dropdown">
+          <button class="dropdown-item" (click)="onEdit($event)">Modifier</button>
+          <button class="dropdown-item danger" (click)="onDelete($event)">Supprimer</button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <h3 class="project-name">{{ project().name }}</h3>
+
+  @if (project().description) {
+    <p class="project-description">{{ project().description }}</p>
+  }
+
+  <div class="task-stats">
+    <div class="stat-row">
+      <span class="stat-label">Tâches</span>
+      <span class="stat-value">{{ project().taskCount ?? 0 }}</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">En cours</span>
+      <span class="stat-value in-progress">{{ project().inProgressCount ?? 0 }}</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Terminées</span>
+      <span class="stat-value completed">{{ project().completedCount ?? 0 }}</span>
+    </div>
+  </div>
+
+  @if ((project().taskCount ?? 0) > 0) {
+    <div class="progress-section">
+      <div class="progress-header">
+        <span class="progress-label">Progression</span>
+        <span class="progress-percent">{{ completionPercent }}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="completionPercent"></div>
+      </div>
+    </div>
+  }
+</div>
