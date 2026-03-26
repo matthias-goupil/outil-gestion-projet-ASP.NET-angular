@@ -1,0 +1,38 @@
+<div class="task-detail">
+  <div class="detail-meta">
+    <span class="task-status" [class]="statusClass">{{ statusLabel }}</span>
+  </div>
+
+  @if (task().description) {
+    <div class="detail-section">
+      <p class="detail-description">{{ task().description }}</p>
+    </div>
+  }
+
+  @if (task().content) {
+    <div class="detail-section">
+      <h4 class="section-label">Contenu</h4>
+      <div class="detail-content ql-editor" [innerHTML]="safeContent"></div>
+    </div>
+  }
+
+  @if (task().assignees && task().assignees!.length > 0) {
+    <div class="detail-section">
+      <h4 class="section-label">Assignés</h4>
+      <div class="assignee-list">
+        @for (assignee of task().assignees!; track assignee.id) {
+          <div class="assignee-item">
+            <div class="assignee-avatar" [title]="memberDisplayName(assignee)">
+              {{ memberAvatarLetter(assignee) }}
+            </div>
+            <span class="assignee-name">{{ memberDisplayName(assignee) }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="detail-actions">
+    <button class="btn-edit" (click)="editRequested.emit(task())">Modifier</button>
+  </div>
+</div>

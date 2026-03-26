@@ -2,6 +2,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { KanbanBoard } from '../../components/kanban-board/kanban-board';
 import { TaskForm } from '../../components/task-form/task-form';
+import { TaskDetail } from '../../components/task-detail/task-detail';
 import { TaskFilter } from '../../components/task-filter/task-filter';
 import { Modal } from '../../components/modal/modal';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
@@ -16,7 +17,7 @@ import { Member } from '../../models/member.model';
 
 @Component({
   selector: 'app-project-detail',
-  imports: [KanbanBoard, TaskForm, TaskFilter, Modal, ConfirmModal, ProjectMembers, UserMenu, RouterLink],
+  imports: [KanbanBoard, TaskForm, TaskDetail, TaskFilter, Modal, ConfirmModal, ProjectMembers, UserMenu, RouterLink],
   templateUrl: './project-detail.html',
   styleUrl: './project-detail.css'
 })
@@ -35,6 +36,7 @@ export class ProjectDetail implements OnInit {
 
   showCreateModal = signal(false);
   showMembersModal = signal(false);
+  taskToView = signal<Task | null>(null);
   taskToEdit = signal<Task | null>(null);
   taskToDelete = signal<Task | null>(null);
 

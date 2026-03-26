@@ -16,14 +16,24 @@
   </div>
 
   <div class="form-field">
-    <label for="content">Description</label>
+    <label for="description">Description</label>
     <textarea
-      id="content"
+      id="description"
+      [(ngModel)]="description"
+      name="description"
+      placeholder="Courte description de la tâche"
+      rows="2"
+    ></textarea>
+  </div>
+
+  <div class="form-field">
+    <label>Contenu</label>
+    <app-quill-editor
       [(ngModel)]="content"
       name="content"
-      placeholder="Description optionnelle"
-      rows="3"
-    ></textarea>
+      placeholder="Contenu détaillé, instructions..."
+      [modules]="quillModules"
+    />
   </div>
 
   @if (members().length > 0) {

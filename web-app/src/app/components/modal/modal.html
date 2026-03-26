@@ -1,5 +1,5 @@
 <div class="modal-backdrop" (click)="onBackdropClick($event)">
-  <div class="modal-box">
+  <div class="modal-box" [class.modal-lg]="size() === 'lg'">
     <div class="modal-header">
       <h2>{{ title() }}</h2>
       <button class="modal-close" (click)="closed.emit()">✕</button>

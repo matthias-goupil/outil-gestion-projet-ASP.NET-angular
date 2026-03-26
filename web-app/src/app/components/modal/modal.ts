@@ -8,6 +8,7 @@ import { Component, input, output } from '@angular/core';
 })
 export class Modal {
   title = input<string>('');
+  size = input<'md' | 'lg'>('md');
   closed = output<void>();
 
   onBackdropClick(event: MouseEvent) {

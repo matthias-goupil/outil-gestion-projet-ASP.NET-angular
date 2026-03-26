@@ -11,10 +11,19 @@
       }
     </div>
   </div>
+
   <h3 class="task-title">{{ task().title }}</h3>
-  @if (task().content) {
-    <p class="task-content">{{ task().content }}</p>
+
+  @if (task().description) {
+    <p class="task-description">{{ task().description }}</p>
   }
+
+  @if (task().content) {
+    <div class="task-content-badge" title="Contenu riche disponible">
+      <span class="content-icon">&#9783;</span> Contenu
+    </div>
+  }
+
   @if (task().assignees && task().assignees!.length > 0) {
     <div class="task-assignees">
       @for (assignee of task().assignees!.slice(0, 3); track assignee.id) {

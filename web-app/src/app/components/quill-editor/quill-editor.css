@@ -1,0 +1,44 @@
+:host {
+  display: block;
+}
+
+:host .ql-container {
+  font-family: inherit;
+  font-size: 14px;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+:host .ql-toolbar {
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  background: #f8fafc;
+}
+
+:host .ql-editor {
+  min-height: 140px;
+  max-height: 320px;
+  overflow-y: auto;
+  color: #1e293b;
+  line-height: 1.6;
+}
+
+:host .ql-editor.ql-blank::before {
+  color: #94a3b8;
+  font-style: normal;
+}
+
+:host .ql-container.ql-snow,
+:host .ql-toolbar.ql-snow {
+  border-color: #d1d5db;
+}
+
+:host:focus-within .ql-container.ql-snow,
+:host:focus-within .ql-toolbar.ql-snow {
+  border-color: #6366f1;
+}
+
+:host:focus-within .ql-toolbar.ql-snow {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 -0px 0 3px rgba(99, 102, 241, 0.1), -3px 0 0 rgba(99, 102, 241, 0.1), 3px 0 0 rgba(99, 102, 241, 0.1);
+}

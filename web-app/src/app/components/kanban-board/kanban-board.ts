@@ -22,8 +22,23 @@ export class KanbanBoard implements OnChanges {
 
   tasks = input.required<Task[]>();
   projectId = input.required<number>();
+  viewRequested = output<Task>();
   editRequested = output<Task>();
   deleteRequested = output<Task>();
+
+  private wasDragged = false;
+
+  onDragStarted() {
+    this.wasDragged = true;
+  }
+
+  onCardClick(task: Task) {
+    if (this.wasDragged) {
+      this.wasDragged = false;
+      return;
+    }
+    this.viewRequested.emit(task);
+  }
 
   columns: KanbanColumn[] = [
     { status: TaskStatus.NotStarted, label: 'À faire',    tasks: [] },

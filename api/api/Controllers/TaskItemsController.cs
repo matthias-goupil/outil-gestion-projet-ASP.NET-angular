@@ -60,6 +60,7 @@ public class TaskItemsController : ControllerBase
         var task = new TaskItem
         {
             Title = dto.Title,
+            Description = dto.Description,
             Content = dto.Content,
             Status = dto.Status,
             Order = dto.Order,
@@ -93,6 +94,7 @@ public class TaskItemsController : ControllerBase
         if (task == null) return NotFound();
 
         task.Title = dto.Title;
+        task.Description = dto.Description;
         task.Content = dto.Content;
         task.Status = dto.Status;
         task.Order = dto.Order;
@@ -128,6 +130,7 @@ public class TaskItemsController : ControllerBase
     {
         Id = t.Id,
         Title = t.Title,
+        Description = t.Description,
         Content = t.Content,
         Status = t.Status,
         Order = t.Order,

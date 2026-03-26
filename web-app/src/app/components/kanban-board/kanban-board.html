@@ -15,7 +15,9 @@
         (cdkDropListDropped)="drop($event, col)"
       >
         @for (task of col.tasks; track task.id) {
-          <div cdkDrag [cdkDragData]="task" class="drag-item">
+          <div cdkDrag [cdkDragData]="task" class="drag-item"
+               (cdkDragStarted)="onDragStarted()"
+               (click)="onCardClick(task)">
             <app-task-card
               [task]="task"
               (editRequested)="editRequested.emit($event)"
