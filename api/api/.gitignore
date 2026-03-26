@@ -1,0 +1,49 @@
+# Build results
+bin/
+obj/
+out/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider files
+.idea/
+
+# Visual Studio Code files
+.vscode/
+
+# NuGet packages
+*.nupkg
+packages/
+.nuget/
+
+# ASP.NET / IIS
+*.log
+*.vspscc
+*.vssscc
+
+# Publish output
+publish/
+*.pubxml
+*.publishsettings
+
+# ASP.NET temporary files
+App_Data/Temp/
+App_Data/Logs/
+
+# Rider caches
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Secret / user-specific files
+*.pfx
+*.key
+*.env
+appsettings.Development.json
