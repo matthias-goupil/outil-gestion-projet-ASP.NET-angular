@@ -2,9 +2,8 @@
   <div class="page-header">
     <h1>Mes projets</h1>
     <div class="header-actions">
-      <span class="user-email">{{ authService.currentEmail() }}</span>
       <button class="btn-new" (click)="showCreateModal.set(true)">+ Nouveau projet</button>
-      <button class="btn-logout" (click)="authService.logout()">Déconnexion</button>
+      <app-user-menu />
     </div>
   </div>
 

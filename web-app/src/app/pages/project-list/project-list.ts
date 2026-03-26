@@ -4,19 +4,18 @@ import { ProjectCard } from '../../components/project-card/project-card';
 import { ProjectForm } from '../../components/project-form/project-form';
 import { Modal } from '../../components/modal/modal';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
+import { UserMenu } from '../../components/user-menu/user-menu';
 import { ProjectService } from '../../services/project.service';
-import { AuthService } from '../../services/auth.service';
 import { Project } from '../../models/project.model';
 
 @Component({
   selector: 'app-project-list',
-  imports: [ProjectCard, ProjectForm, Modal, ConfirmModal],
+  imports: [ProjectCard, ProjectForm, Modal, ConfirmModal, UserMenu],
   templateUrl: './project-list.html',
   styleUrl: './project-list.css'
 })
 export class ProjectList implements OnInit {
   private readonly projectService = inject(ProjectService);
-  readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
   projects = signal<Project[]>([]);

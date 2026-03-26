@@ -12,7 +12,7 @@
     <div class="header-actions">
       <button class="btn-members" (click)="showMembersModal.set(true)">Membres</button>
       <button class="btn-new" (click)="showCreateModal.set(true)">+ Nouvelle tâche</button>
-      <button class="btn-logout" (click)="authService.logout()">Déconnexion</button>
+      <app-user-menu />
     </div>
   </div>
 

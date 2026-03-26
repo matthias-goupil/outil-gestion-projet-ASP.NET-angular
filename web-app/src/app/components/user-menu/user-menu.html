@@ -1,0 +1,56 @@
+<div class="user-menu">
+  <button class="avatar-btn" (click)="toggleDropdown($event)" [title]="authService.currentEmail()">
+    <span class="avatar">{{ initials }}</span>
+    <span class="user-name">{{ authService.currentDisplayName }}</span>
+  </button>
+
+  @if (dropdownOpen) {
+    <div class="dropdown" (click)="$event.stopPropagation()">
+      <div class="dropdown-header">
+        <span class="dropdown-name">{{ authService.currentDisplayName }}</span>
+        <span class="dropdown-email">{{ authService.currentEmail() }}</span>
+      </div>
+      <div class="dropdown-divider"></div>
+      <button class="dropdown-item" (click)="openProfile($event)">Mon profil</button>
+      <button class="dropdown-item danger" (click)="authService.logout()">Déconnexion</button>
+    </div>
+  }
+</div>
+
+@if (showProfileModal) {
+  <app-modal title="Mon profil" (closed)="showProfileModal = false">
+    <form class="profile-form" (ngSubmit)="saveProfile()">
+      @if (error()) {
+        <p class="form-error">{{ error() }}</p>
+      }
+      @if (success()) {
+        <p class="form-success">Profil mis à jour.</p>
+      }
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="pFirstName">Prénom</label>
+          <input id="pFirstName" type="text" [(ngModel)]="firstName" name="firstName" required />
+        </div>
+        <div class="form-field">
+          <label for="pLastName">Nom</label>
+          <input id="pLastName" type="text" [(ngModel)]="lastName" name="lastName" required />
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="pEmail">Email</label>
+        <input id="pEmail" type="email" [(ngModel)]="email" name="email" required />
+      </div>
+
+      <div class="form-field">
+        <label for="pPassword">Nouveau mot de passe <span class="optional">(laisser vide pour ne pas changer)</span></label>
+        <input id="pPassword" type="password" [(ngModel)]="newPassword" name="newPassword" placeholder="••••••••" />
+      </div>
+
+      <button type="submit" [disabled]="!firstName.trim() || !lastName.trim() || !email.trim() || saving()">
+        {{ saving() ? 'Enregistrement...' : 'Enregistrer' }}
+      </button>
+    </form>
+  </app-modal>
+}

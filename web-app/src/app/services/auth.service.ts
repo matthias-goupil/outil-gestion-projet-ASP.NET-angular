@@ -51,6 +51,12 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
+  updateProfile(data: { firstName: string; lastName: string; email: string; newPassword?: string }) {
+    return this.http.put<AuthResponse>('/api/auth/me', data).pipe(
+      tap(res => this.saveSession(res))
+    );
+  }
+
   getToken(): string | null {
     return this.isBrowser ? localStorage.getItem(this.tokenKey) : null;
   }

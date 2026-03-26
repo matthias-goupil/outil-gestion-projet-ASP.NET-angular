@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -23,6 +24,8 @@ public class AuthController : ControllerBase
         _config = config;
     }
 
+    private int GetUserId() => int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
     // POST: api/auth/register
     [HttpPost("register")]
     public async Task<ActionResult<AuthResponseDto>> Register(RegisterDto dto)
@@ -34,8 +37,8 @@ public class AuthController : ControllerBase
         {
             Email = dto.Email.ToLower(),
             PasswordHash = HashPassword(dto.Password),
-            FirstName = dto.FirstName?.Trim(),
-            LastName = dto.LastName?.Trim()
+            FirstName = dto.FirstName.Trim(),
+            LastName = dto.LastName.Trim()
         };
 
         _context.Users.Add(user);
@@ -52,6 +55,31 @@ public class AuthController : ControllerBase
 
         if (user == null || !VerifyPassword(dto.Password, user.PasswordHash))
             return Unauthorized(new { message = "Email ou mot de passe incorrect." });
+
+        return Ok(new AuthResponseDto { Token = GenerateToken(user), Email = user.Email, FirstName = user.FirstName, LastName = user.LastName });
+    }
+
+    // PUT: api/auth/me
+    [Authorize]
+    [HttpPut("me")]
+    public async Task<ActionResult<AuthResponseDto>> UpdateProfile(UpdateProfileDto dto)
+    {
+        var userId = GetUserId();
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return NotFound();
+
+        var newEmail = dto.Email.ToLower().Trim();
+        if (await _context.Users.AnyAsync(u => u.Email == newEmail && u.Id != userId))
+            return Conflict(new { message = "Cette adresse email est déjà utilisée." });
+
+        user.FirstName = dto.FirstName.Trim();
+        user.LastName = dto.LastName.Trim();
+        user.Email = newEmail;
+
+        if (!string.IsNullOrWhiteSpace(dto.NewPassword))
+            user.PasswordHash = HashPassword(dto.NewPassword);
+
+        await _context.SaveChangesAsync();
 
         return Ok(new AuthResponseDto { Token = GenerateToken(user), Email = user.Email, FirstName = user.FirstName, LastName = user.LastName });
     }

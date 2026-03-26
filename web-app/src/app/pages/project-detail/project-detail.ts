@@ -6,8 +6,8 @@ import { TaskFilter } from '../../components/task-filter/task-filter';
 import { Modal } from '../../components/modal/modal';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
 import { ProjectMembers } from '../../components/project-members/project-members';
+import { UserMenu } from '../../components/user-menu/user-menu';
 import { ProjectService } from '../../services/project.service';
-import { AuthService } from '../../services/auth.service';
 import { TaskService } from '../../services/task.service';
 import { MemberService } from '../../services/member.service';
 import { Project } from '../../models/project.model';
@@ -16,13 +16,12 @@ import { Member } from '../../models/member.model';
 
 @Component({
   selector: 'app-project-detail',
-  imports: [KanbanBoard, TaskForm, TaskFilter, Modal, ConfirmModal, ProjectMembers, RouterLink],
+  imports: [KanbanBoard, TaskForm, TaskFilter, Modal, ConfirmModal, ProjectMembers, UserMenu, RouterLink],
   templateUrl: './project-detail.html',
   styleUrl: './project-detail.css'
 })
 export class ProjectDetail implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly projectService = inject(ProjectService);
   private readonly taskService = inject(TaskService);
