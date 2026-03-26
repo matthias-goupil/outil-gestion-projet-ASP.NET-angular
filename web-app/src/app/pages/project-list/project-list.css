@@ -6,11 +6,25 @@
 
 h1 { margin: 0; font-size: 24px; font-weight: 700; color: #1e293b; }
 
+.header-actions {
+  display: flex; align-items: center; gap: 12px;
+}
+
+.user-email {
+  font-size: 13px; color: #64748b;
+}
+
 .btn-new {
   background: #6366f1; color: #fff; border: none; border-radius: 8px;
   padding: 10px 20px; font-size: 14px; font-weight: 500; cursor: pointer;
 }
 .btn-new:hover { background: #4f46e5; }
+
+.btn-logout {
+  background: none; border: 1px solid #e2e8f0; border-radius: 8px;
+  padding: 9px 16px; font-size: 14px; color: #64748b; cursor: pointer;
+}
+.btn-logout:hover { background: #f8fafc; color: #1e293b; }
 
 .project-grid {
   display: grid;

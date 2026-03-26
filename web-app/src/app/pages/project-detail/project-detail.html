@@ -9,7 +9,10 @@
         }
       }
     </div>
-    <button class="btn-new" (click)="showCreateModal.set(true)">+ Nouvelle tâche</button>
+    <div class="header-actions">
+      <button class="btn-new" (click)="showCreateModal.set(true)">+ Nouvelle tâche</button>
+      <button class="btn-logout" (click)="authService.logout()">Déconnexion</button>
+    </div>
   </div>
 
   @if (loading()) {

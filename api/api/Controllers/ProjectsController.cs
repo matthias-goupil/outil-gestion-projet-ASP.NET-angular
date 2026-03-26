@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Api.Models;
@@ -5,6 +7,7 @@ using Api.DTOs;
 
 namespace Api.Controllers;
 
+[Authorize]
 [Route("api/projects")]
 [ApiController]
 public class ProjectsController : ControllerBase
@@ -16,11 +19,15 @@ public class ProjectsController : ControllerBase
         _context = context;
     }
 
+    private int GetUserId() => int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
     // GET: api/projects
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProjectDto>>> GetProjects()
     {
+        var userId = GetUserId();
         return await _context.Projects
+            .Where(p => p.Users.Any(u => u.Id == userId))
             .Select(p => new ProjectDto
             {
                 Id = p.Id,
@@ -37,8 +44,9 @@ public class ProjectsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<ProjectDto>> GetProject(int id)
     {
+        var userId = GetUserId();
         var project = await _context.Projects
-            .Where(p => p.Id == id)
+            .Where(p => p.Id == id && p.Users.Any(u => u.Id == userId))
             .Select(p => new ProjectDto
             {
                 Id = p.Id,
@@ -58,10 +66,16 @@ public class ProjectsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ProjectDto>> PostProject(ProjectCreateDto dto)
     {
+        var user = await _context.Users.FindAsync(GetUserId());
+        if (user == null) return Unauthorized();
+
         var project = new Project { Name = dto.Name, Description = dto.Description };
+        project.Users.Add(user);
         _context.Projects.Add(project);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetProject), new { id = project.Id }, new ProjectDto { Id = project.Id, Name = project.Name, Description = project.Description });
+
+        return CreatedAtAction(nameof(GetProject), new { id = project.Id },
+            new ProjectDto { Id = project.Id, Name = project.Name, Description = project.Description });
     }
 
     // PUT: api/projects/5
@@ -70,12 +84,15 @@ public class ProjectsController : ControllerBase
     {
         if (id != dto.Id) return BadRequest();
 
-        var project = await _context.Projects.FindAsync(id);
+        var userId = GetUserId();
+        var project = await _context.Projects
+            .Include(p => p.Users)
+            .FirstOrDefaultAsync(p => p.Id == id && p.Users.Any(u => u.Id == userId));
+
         if (project == null) return NotFound();
 
         project.Name = dto.Name;
         project.Description = dto.Description;
-
         await _context.SaveChangesAsync();
         return NoContent();
     }
@@ -84,7 +101,11 @@ public class ProjectsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProject(int id)
     {
-        var project = await _context.Projects.FindAsync(id);
+        var userId = GetUserId();
+        var project = await _context.Projects
+            .Include(p => p.Users)
+            .FirstOrDefaultAsync(p => p.Id == id && p.Users.Any(u => u.Id == userId));
+
         if (project == null) return NotFound();
 
         _context.Projects.Remove(project);

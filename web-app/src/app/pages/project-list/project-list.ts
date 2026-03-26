@@ -5,6 +5,7 @@ import { ProjectForm } from '../../components/project-form/project-form';
 import { Modal } from '../../components/modal/modal';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
 import { ProjectService } from '../../services/project.service';
+import { AuthService } from '../../services/auth.service';
 import { Project } from '../../models/project.model';
 
 @Component({
@@ -15,6 +16,7 @@ import { Project } from '../../models/project.model';
 })
 export class ProjectList implements OnInit {
   private readonly projectService = inject(ProjectService);
+  readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
   projects = signal<Project[]>([]);

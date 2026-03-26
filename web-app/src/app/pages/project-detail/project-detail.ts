@@ -5,6 +5,7 @@ import { TaskForm } from '../../components/task-form/task-form';
 import { Modal } from '../../components/modal/modal';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
 import { ProjectService } from '../../services/project.service';
+import { AuthService } from '../../services/auth.service';
 import { TaskService } from '../../services/task.service';
 import { Project } from '../../models/project.model';
 import { Task } from '../../models/task.model';
@@ -17,6 +18,7 @@ import { Task } from '../../models/task.model';
 })
 export class ProjectDetail implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly projectService = inject(ProjectService);
   private readonly taskService = inject(TaskService);

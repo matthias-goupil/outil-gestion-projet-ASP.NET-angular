@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Api.Models;
@@ -5,6 +7,7 @@ using Api.DTOs;
 
 namespace Api.Controllers;
 
+[Authorize]
 [Route("api/projects/{projectId}/tasks")]
 [ApiController]
 public class TaskItemsController : ControllerBase
@@ -16,11 +19,16 @@ public class TaskItemsController : ControllerBase
         _context = context;
     }
 
+    private int GetUserId() => int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+    private async Task<bool> UserOwnsProject(int projectId) =>
+        await _context.Projects.AnyAsync(p => p.Id == projectId && p.Users.Any(u => u.Id == GetUserId()));
+
     // GET: api/projects/5/tasks
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TaskItemDto>>> GetTasks(int projectId)
     {
-        if (!await _context.Projects.AnyAsync(p => p.Id == projectId)) return NotFound();
+        if (!await UserOwnsProject(projectId)) return NotFound();
 
         return await _context.Tasks
             .Where(t => t.ProjectId == projectId)
@@ -32,6 +40,8 @@ public class TaskItemsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<TaskItemDto>> GetTaskItem(int projectId, int id)
     {
+        if (!await UserOwnsProject(projectId)) return NotFound();
+
         var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.ProjectId == projectId);
         if (task == null) return NotFound();
         return ToDto(task);
@@ -41,7 +51,7 @@ public class TaskItemsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<TaskItemDto>> PostTaskItem(int projectId, TaskItemCreateDto dto)
     {
-        if (!await _context.Projects.AnyAsync(p => p.Id == projectId)) return NotFound();
+        if (!await UserOwnsProject(projectId)) return NotFound();
 
         var task = new TaskItem
         {
@@ -63,6 +73,7 @@ public class TaskItemsController : ControllerBase
     public async Task<IActionResult> PutTaskItem(int projectId, int id, TaskItemDto dto)
     {
         if (id != dto.Id || projectId != dto.ProjectId) return BadRequest();
+        if (!await UserOwnsProject(projectId)) return NotFound();
 
         var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.ProjectId == projectId);
         if (task == null) return NotFound();
@@ -80,6 +91,8 @@ public class TaskItemsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTaskItem(int projectId, int id)
     {
+        if (!await UserOwnsProject(projectId)) return NotFound();
+
         var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.ProjectId == projectId);
         if (task == null) return NotFound();
 
