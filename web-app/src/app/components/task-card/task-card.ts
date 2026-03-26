@@ -1,6 +1,7 @@
 import { Component, HostListener, input, output } from '@angular/core';
 import { Task } from '../../models/task.model';
 import { TaskStatus } from '../../models/task-status.model';
+import { memberAvatarLetter } from '../../models/member.model';
 
 @Component({
   selector: 'app-task-card',
@@ -49,6 +50,8 @@ export class TaskCard {
     this.menuOpen = false;
     this.deleteRequested.emit(this.task());
   }
+
+    avatarLetter = memberAvatarLetter;
 
   @HostListener('document:click')
   closeMenu() {

@@ -1,0 +1,20 @@
+@if (members().length > 0) {
+  <div class="task-filter">
+    <span class="filter-label">Filtrer :</span>
+    <button
+      class="filter-btn"
+      [class.active]="selectedIds.length === 0"
+      (click)="clearFilter()"
+    >Tous</button>
+    @for (member of members(); track member.id) {
+      <button
+        class="filter-avatar"
+        [class.selected]="isSelected(member.id)"
+        (click)="toggle(member.id)"
+        [title]="displayName(member)"
+      >
+        {{ avatarLetter(member) }}
+      </button>
+    }
+  </div>
+}

@@ -16,11 +16,17 @@ export class TaskService {
   }
 
   create(projectId: number, task: Omit<Task, 'id' | 'projectId'>): Observable<Task> {
-    return this.http.post<Task>(this.url(projectId), task);
+    return this.http.post<Task>(this.url(projectId), {
+      ...task,
+      assigneeIds: task.assigneeIds ?? task.assignees?.map(a => a.id) ?? []
+    });
   }
 
   update(projectId: number, id: number, task: Task): Observable<void> {
-    return this.http.put<void>(`${this.url(projectId)}/${id}`, task);
+    return this.http.put<void>(`${this.url(projectId)}/${id}`, {
+      ...task,
+      assigneeIds: task.assigneeIds ?? task.assignees?.map(a => a.id) ?? []
+    });
   }
 
   delete(projectId: number, id: number): Observable<void> {

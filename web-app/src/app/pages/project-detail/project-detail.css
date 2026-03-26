@@ -23,11 +23,25 @@ h1 { margin: 0; font-size: 22px; font-weight: 700; color: #1e293b; }
 }
 .btn-new:hover { background: #4f46e5; }
 
+.btn-members {
+  background: none; border: 1px solid #6366f1; border-radius: 8px;
+  padding: 9px 16px; font-size: 14px; color: #6366f1; cursor: pointer; font-weight: 500;
+}
+.btn-members:hover { background: #eef2ff; }
+
 .btn-logout {
   background: none; border: 1px solid #e2e8f0; border-radius: 8px;
   padding: 9px 16px; font-size: 14px; color: #64748b; cursor: pointer;
 }
 .btn-logout:hover { background: #f8fafc; color: #1e293b; }
+
+.filter-bar {
+  margin-bottom: 20px;
+  padding: 10px 16px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
 
 .state-message { color: #64748b; font-size: 15px; }
 .state-message.error { color: #dc2626; }

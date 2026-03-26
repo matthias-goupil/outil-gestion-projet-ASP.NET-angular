@@ -7,15 +7,25 @@
     }
 
     <form (ngSubmit)="submit()">
+      <div class="form-row">
+        <div class="form-field">
+          <label for="firstName">Prénom <span class="required">*</span></label>
+          <input id="firstName" type="text" [(ngModel)]="firstName" name="firstName" placeholder="Prénom" required />
+        </div>
+        <div class="form-field">
+          <label for="lastName">Nom <span class="required">*</span></label>
+          <input id="lastName" type="text" [(ngModel)]="lastName" name="lastName" placeholder="Nom" required />
+        </div>
+      </div>
       <div class="form-field">
-        <label for="email">Email</label>
+        <label for="email">Email <span class="required">*</span></label>
         <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="vous@exemple.com" required />
       </div>
       <div class="form-field">
-        <label for="password">Mot de passe</label>
+        <label for="password">Mot de passe <span class="required">*</span></label>
         <input id="password" type="password" [(ngModel)]="password" name="password" placeholder="••••••••" required />
       </div>
-      <button type="submit" [disabled]="!email || !password || submitting()">
+      <button type="submit" [disabled]="!firstName.trim() || !lastName.trim() || !email || !password || submitting()">
         {{ submitting() ? 'Création...' : 'Créer mon compte' }}
       </button>
     </form>

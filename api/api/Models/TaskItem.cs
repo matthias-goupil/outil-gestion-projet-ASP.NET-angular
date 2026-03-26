@@ -10,4 +10,6 @@ public class TaskItem
     public int ProjectId { get; set; }
     [System.Text.Json.Serialization.JsonIgnore]
     public Project? Project { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore]
+    public ICollection<User> Assignees { get; set; } = [];
 }

@@ -30,10 +30,12 @@ public class TaskItemsController : ControllerBase
     {
         if (!await UserOwnsProject(projectId)) return NotFound();
 
-        return await _context.Tasks
+        var tasks = await _context.Tasks
             .Where(t => t.ProjectId == projectId)
-            .Select(t => ToDto(t))
+            .Include(t => t.Assignees)
             .ToListAsync();
+
+        return tasks.Select(ToDto).ToList();
     }
 
     // GET: api/projects/5/tasks/3
@@ -42,7 +44,9 @@ public class TaskItemsController : ControllerBase
     {
         if (!await UserOwnsProject(projectId)) return NotFound();
 
-        var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.ProjectId == projectId);
+        var task = await _context.Tasks
+            .Include(t => t.Assignees)
+            .FirstOrDefaultAsync(t => t.Id == id && t.ProjectId == projectId);
         if (task == null) return NotFound();
         return ToDto(task);
     }
@@ -62,6 +66,14 @@ public class TaskItemsController : ControllerBase
             ProjectId = projectId
         };
 
+        if (dto.AssigneeIds.Count > 0)
+        {
+            var assignees = await _context.Users
+                .Where(u => dto.AssigneeIds.Contains(u.Id))
+                .ToListAsync();
+            task.Assignees = assignees;
+        }
+
         _context.Tasks.Add(task);
         await _context.SaveChangesAsync();
 
@@ -75,13 +87,24 @@ public class TaskItemsController : ControllerBase
         if (id != dto.Id || projectId != dto.ProjectId) return BadRequest();
         if (!await UserOwnsProject(projectId)) return NotFound();
 
-        var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.ProjectId == projectId);
+        var task = await _context.Tasks
+            .Include(t => t.Assignees)
+            .FirstOrDefaultAsync(t => t.Id == id && t.ProjectId == projectId);
         if (task == null) return NotFound();
 
         task.Title = dto.Title;
         task.Content = dto.Content;
         task.Status = dto.Status;
         task.Order = dto.Order;
+
+        task.Assignees.Clear();
+        if (dto.AssigneeIds.Count > 0)
+        {
+            var assignees = await _context.Users
+                .Where(u => dto.AssigneeIds.Contains(u.Id))
+                .ToListAsync();
+            foreach (var a in assignees) task.Assignees.Add(a);
+        }
 
         await _context.SaveChangesAsync();
         return NoContent();
@@ -108,6 +131,8 @@ public class TaskItemsController : ControllerBase
         Content = t.Content,
         Status = t.Status,
         Order = t.Order,
-        ProjectId = t.ProjectId
+        ProjectId = t.ProjectId,
+        Assignees = t.Assignees.Select(u => new MemberDto { Id = u.Id, Email = u.Email, FirstName = u.FirstName, LastName = u.LastName }).ToList(),
+        AssigneeIds = t.Assignees.Select(u => u.Id).ToList()
     };
 }

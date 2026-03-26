@@ -28,5 +28,10 @@ public class TaskContext : DbContext
             .HasMany(u => u.Projects)
             .WithMany(p => p.Users)
             .UsingEntity("ProjectUser");
+
+        modelBuilder.Entity<TaskItem>()
+            .HasMany(t => t.Assignees)
+            .WithMany()
+            .UsingEntity("TaskAssignee");
     }
 }

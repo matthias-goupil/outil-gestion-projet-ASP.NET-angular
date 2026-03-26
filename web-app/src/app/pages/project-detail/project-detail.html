@@ -10,10 +10,17 @@
       }
     </div>
     <div class="header-actions">
+      <button class="btn-members" (click)="showMembersModal.set(true)">Membres</button>
       <button class="btn-new" (click)="showCreateModal.set(true)">+ Nouvelle tâche</button>
       <button class="btn-logout" (click)="authService.logout()">Déconnexion</button>
     </div>
   </div>
+
+  @if (members().length > 0) {
+    <div class="filter-bar">
+      <app-task-filter [members]="members()" (filterChanged)="filterMemberIds.set($event)" />
+    </div>
+  }
 
   @if (loading()) {
     <p class="state-message">Chargement...</p>
@@ -21,7 +28,7 @@
     <p class="state-message error">{{ error() }}</p>
   } @else {
     <app-kanban-board
-      [tasks]="tasks()"
+      [tasks]="filteredTasks()"
       [projectId]="projectId"
       (editRequested)="taskToEdit.set($event)"
       (deleteRequested)="taskToDelete.set($event)"
@@ -29,15 +36,21 @@
   }
 </div>
 
+@if (showMembersModal()) {
+  <app-modal title="Membres du projet" (closed)="showMembersModal.set(false)">
+    <app-project-members [projectId]="projectId" />
+  </app-modal>
+}
+
 @if (showCreateModal()) {
   <app-modal title="Nouvelle tâche" (closed)="showCreateModal.set(false)">
-    <app-task-form [projectId]="projectId" (taskCreated)="onTaskCreated($event)" />
+    <app-task-form [projectId]="projectId" [members]="members()" (taskCreated)="onTaskCreated($event)" />
   </app-modal>
 }
 
 @if (taskToEdit()) {
   <app-modal title="Modifier la tâche" (closed)="taskToEdit.set(null)">
-    <app-task-form [projectId]="projectId" [task]="taskToEdit()" (taskUpdated)="onTaskUpdated($event)" />
+    <app-task-form [projectId]="projectId" [task]="taskToEdit()" [members]="members()" (taskUpdated)="onTaskUpdated($event)" />
   </app-modal>
 }
 

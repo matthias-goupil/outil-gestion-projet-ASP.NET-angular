@@ -13,17 +13,24 @@ export class Register {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
+  firstName = '';
+  lastName = '';
   email = '';
   password = '';
   submitting = signal(false);
   error = signal<string | null>(null);
 
   submit() {
-    if (!this.email || !this.password) return;
+    if (!this.firstName.trim() || !this.lastName.trim() || !this.email || !this.password) return;
     this.submitting.set(true);
     this.error.set(null);
 
-    this.authService.register({ email: this.email, password: this.password }).subscribe({
+    this.authService.register({
+      email: this.email,
+      password: this.password,
+      firstName: this.firstName.trim(),
+      lastName: this.lastName.trim()
+    }).subscribe({
       next: () => this.router.navigate(['/']),
       error: (err) => {
         this.error.set(err.error?.message ?? 'Une erreur est survenue.');

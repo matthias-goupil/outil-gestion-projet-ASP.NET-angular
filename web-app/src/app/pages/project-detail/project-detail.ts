@@ -1,18 +1,22 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { KanbanBoard } from '../../components/kanban-board/kanban-board';
 import { TaskForm } from '../../components/task-form/task-form';
+import { TaskFilter } from '../../components/task-filter/task-filter';
 import { Modal } from '../../components/modal/modal';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
+import { ProjectMembers } from '../../components/project-members/project-members';
 import { ProjectService } from '../../services/project.service';
 import { AuthService } from '../../services/auth.service';
 import { TaskService } from '../../services/task.service';
+import { MemberService } from '../../services/member.service';
 import { Project } from '../../models/project.model';
 import { Task } from '../../models/task.model';
+import { Member } from '../../models/member.model';
 
 @Component({
   selector: 'app-project-detail',
-  imports: [KanbanBoard, TaskForm, Modal, ConfirmModal, RouterLink],
+  imports: [KanbanBoard, TaskForm, TaskFilter, Modal, ConfirmModal, ProjectMembers, RouterLink],
   templateUrl: './project-detail.html',
   styleUrl: './project-detail.css'
 })
@@ -22,15 +26,28 @@ export class ProjectDetail implements OnInit {
   private readonly router = inject(Router);
   private readonly projectService = inject(ProjectService);
   private readonly taskService = inject(TaskService);
+  private readonly memberService = inject(MemberService);
 
   project = signal<Project | null>(null);
   tasks = signal<Task[]>([]);
+  members = signal<Member[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);
 
   showCreateModal = signal(false);
+  showMembersModal = signal(false);
   taskToEdit = signal<Task | null>(null);
   taskToDelete = signal<Task | null>(null);
+
+  filterMemberIds = signal<number[]>([]);
+
+  filteredTasks = computed(() => {
+    const ids = this.filterMemberIds();
+    if (ids.length === 0) return this.tasks();
+    return this.tasks().filter(t =>
+      t.assignees?.some(a => ids.includes(a.id)) ?? false
+    );
+  });
 
   get projectId() { return Number(this.route.snapshot.paramMap.get('id')); }
 
@@ -43,6 +60,9 @@ export class ProjectDetail implements OnInit {
     this.taskService.getAll(id).subscribe({
       next: (tasks) => { this.tasks.set(tasks); this.loading.set(false); },
       error: () => { this.error.set('Impossible de charger les tâches.'); this.loading.set(false); }
+    });
+    this.memberService.getAll(id).subscribe({
+      next: (members) => this.members.set(members)
     });
   }
 

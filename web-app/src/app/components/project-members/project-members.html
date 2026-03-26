@@ -1,0 +1,39 @@
+<div class="members">
+  <div class="member-list">
+    @for (member of members(); track member.id) {
+      <div class="member-row">
+        <div class="member-avatar">{{ avatarLetter(member) }}</div>
+        <div class="member-info">
+          <span class="member-name">{{ displayName(member) }}</span>
+          @if (member.firstName || member.lastName) {
+            <span class="member-email-sub">{{ member.email }}</span>
+          }
+        </div>
+        @if (isCurrentUser(member)) {
+          <span class="member-badge">Vous</span>
+        } @else {
+          <button class="btn-remove" (click)="removeMember(member)" title="Retirer">✕</button>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="add-member">
+    <h3>Inviter un membre</h3>
+    @if (error()) {
+      <p class="add-error">{{ error() }}</p>
+    }
+    <div class="add-row">
+      <input
+        type="email"
+        [(ngModel)]="email"
+        name="email"
+        placeholder="email@exemple.com"
+        (keydown.enter)="addMember()"
+      />
+      <button (click)="addMember()" [disabled]="!email.trim() || adding()">
+        {{ adding() ? '...' : 'Inviter' }}
+      </button>
+    </div>
+  </div>
+</div>

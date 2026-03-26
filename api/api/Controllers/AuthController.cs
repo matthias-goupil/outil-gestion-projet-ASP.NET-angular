@@ -33,13 +33,15 @@ public class AuthController : ControllerBase
         var user = new User
         {
             Email = dto.Email.ToLower(),
-            PasswordHash = HashPassword(dto.Password)
+            PasswordHash = HashPassword(dto.Password),
+            FirstName = dto.FirstName?.Trim(),
+            LastName = dto.LastName?.Trim()
         };
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        return Ok(new AuthResponseDto { Token = GenerateToken(user), Email = user.Email });
+        return Ok(new AuthResponseDto { Token = GenerateToken(user), Email = user.Email, FirstName = user.FirstName, LastName = user.LastName });
     }
 
     // POST: api/auth/login
@@ -51,7 +53,7 @@ public class AuthController : ControllerBase
         if (user == null || !VerifyPassword(dto.Password, user.PasswordHash))
             return Unauthorized(new { message = "Email ou mot de passe incorrect." });
 
-        return Ok(new AuthResponseDto { Token = GenerateToken(user), Email = user.Email });
+        return Ok(new AuthResponseDto { Token = GenerateToken(user), Email = user.Email, FirstName = user.FirstName, LastName = user.LastName });
     }
 
     private string GenerateToken(User user)

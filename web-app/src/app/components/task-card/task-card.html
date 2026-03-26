@@ -15,4 +15,16 @@
   @if (task().content) {
     <p class="task-content">{{ task().content }}</p>
   }
+  @if (task().assignees && task().assignees!.length > 0) {
+    <div class="task-assignees">
+      @for (assignee of task().assignees!.slice(0, 3); track assignee.id) {
+        <div class="assignee-avatar" [title]="assignee.firstName ? (assignee.firstName + ' ' + (assignee.lastName ?? '')) : assignee.email">
+          {{ avatarLetter(assignee) }}
+        </div>
+      }
+      @if (task().assignees!.length > 3) {
+        <div class="assignee-more">+{{ task().assignees!.length - 3 }}</div>
+      }
+    </div>
+  }
 </div>

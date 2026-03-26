@@ -26,6 +26,26 @@
     ></textarea>
   </div>
 
+  @if (members().length > 0) {
+    <div class="form-field">
+      <label>Assignés</label>
+      <div class="assignee-picker">
+        @for (member of members(); track member.id) {
+          <button
+            type="button"
+            class="assignee-chip"
+            [class.selected]="isAssigned(member.id)"
+            (click)="toggleAssignee(member.id)"
+            [title]="member.email"
+          >
+            <span class="chip-avatar">{{ avatarLetter(member) }}</span>
+            <span class="chip-email">{{ displayName(member) }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  }
+
   <button type="submit" [disabled]="!title.trim() || submitting">
     {{ submitting ? 'Enregistrement...' : isEditMode ? 'Enregistrer' : 'Créer la tâche' }}
   </button>
